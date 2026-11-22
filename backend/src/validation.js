@@ -29,5 +29,4 @@ function validateLead(body) {
     data: { name, email, phone, company, source, status },
   };
 }
-
-module.exports = { validateLead, STATUSES, SOURCES };
+module.exports = { validateLead, STATUSES, SOURCES, EMAIL_REGEX };

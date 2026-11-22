@@ -3,6 +3,7 @@ const express = require('express');
 const cors = require('cors');
 require('./db');
 const leadRoutes = require('./src/leadRoutes');
+const authRoutes = require('./src/authRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -14,6 +15,7 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', message: 'Lead Manager API is running' });
 });
 
+app.use('/api/auth', authRoutes);
 app.use('/api/leads', leadRoutes);
 
 // Unknown address
