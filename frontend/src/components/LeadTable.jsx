@@ -11,8 +11,8 @@ const COLUMNS = [
 
 const SORTABLE = ['name', 'email', 'company', 'status'];
 
-function LeadTable({ leads, sortBy, order, onSort, onEdit, onDelete }) {
-  function arrow(key) {
+function LeadTable({ leads, showOwner, sortBy, order, onSort, onEdit, onDelete }) {
+    function arrow(key) {
     if (sortBy !== key) return '';
     return order === 'asc' ? ' ▲' : ' ▼';
   }
@@ -34,6 +34,7 @@ function LeadTable({ leads, sortBy, order, onSort, onEdit, onDelete }) {
                 <th key={key}>{label}</th>
               )
             )}
+            {showOwner && <th>Owner</th>}
             <th>Actions</th>
           </tr>
         </thead>
@@ -48,6 +49,7 @@ function LeadTable({ leads, sortBy, order, onSort, onEdit, onDelete }) {
               <td>
                 <StatusBadge status={lead.status} />
               </td>
+              {showOwner && <td>{lead.owner_name}</td>}
               <td className="actions">
                 <button type="button" className="btn btn-small btn-secondary" onClick={() => onEdit(lead)}>
                   Edit
