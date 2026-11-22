@@ -1,8 +1,17 @@
 const express = require('express');
 const repo = require('./leadRepository');
 const { validateLead, STATUSES } = require('./validation');
+const { requireAuth } = require('./auth');
 
 const router = express.Router();
+
+// Every lead route needs a logged-in user
+router.use(requireAuth);
+
+// Managers see everyone's leads (null = no owner limit); sales users see their own
+function ownerScope(req) {
+  return req.user.role === 'manager' ? null : req.user.id;
+}
 
 function parseId(req, res) {
   const id = Number(req.params.id);
@@ -24,6 +33,7 @@ router.get('/', (req, res) => {
   }
 
   const { leads, total } = repo.findAll({
+    ownerId: ownerScope(req),
     search: search ? search.trim() : '',
     status,
     sortBy,
@@ -41,7 +51,7 @@ router.get('/', (req, res) => {
 // GET /api/leads/stats  (must come before /:id)
 router.get('/stats', (req, res) => {
   const counts = Object.fromEntries(STATUSES.map((s) => [s, 0]));
-  repo.countByStatus().forEach(({ status, count }) => {
+  repo.countByStatus(ownerScope(req)).forEach(({ status, count }) => {
     counts[status] = count;
   });
   res.json({ total: Object.values(counts).reduce((a, b) => a + b, 0), byStatus: counts });
@@ -51,16 +61,16 @@ router.get('/stats', (req, res) => {
 router.get('/:id', (req, res) => {
   const id = parseId(req, res);
   if (id === null) return;
-  const lead = repo.findById(id);
+  const lead = repo.findById(id, ownerScope(req));
   if (!lead) return res.status(404).json({ error: 'Lead not found' });
   res.json(lead);
 });
 
-// POST /api/leads
+// POST /api/leads  (the new lead always belongs to the logged-in user)
 router.post('/', (req, res) => {
   const { isValid, errors, data } = validateLead(req.body);
   if (!isValid) return res.status(400).json({ error: 'Validation failed', details: errors });
-  res.status(201).json(repo.create(data));
+  res.status(201).json(repo.create(req.user.id, data));
 });
 
 // PUT /api/leads/:id
@@ -69,7 +79,7 @@ router.put('/:id', (req, res) => {
   if (id === null) return;
   const { isValid, errors, data } = validateLead(req.body);
   if (!isValid) return res.status(400).json({ error: 'Validation failed', details: errors });
-  const lead = repo.update(id, data);
+  const lead = repo.update(id, ownerScope(req), data);
   if (!lead) return res.status(404).json({ error: 'Lead not found' });
   res.json(lead);
 });
@@ -78,7 +88,7 @@ router.put('/:id', (req, res) => {
 router.delete('/:id', (req, res) => {
   const id = parseId(req, res);
   if (id === null) return;
-  if (!repo.remove(id)) return res.status(404).json({ error: 'Lead not found' });
+  if (!repo.remove(id, ownerScope(req))) return res.status(404).json({ error: 'Lead not found' });
   res.status(204).send();
 });
 
