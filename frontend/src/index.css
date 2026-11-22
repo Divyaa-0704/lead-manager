@@ -1,0 +1,75 @@
+:root {
+  --navy: #071d49;
+  --ice: #d6e6f5;
+  --blue: #2563eb;
+  --blue-dark: #1d4ed8;
+  --chartreuse: #cde04a;
+  --danger: #dc2626;
+  --white: #ffffff;
+  --muted: #5b6b8a;
+  --border: #b9cfe6;
+  --radius: 10px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--ice);
+  color: var(--navy);
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  line-height: 1.5;
+}
+
+h1,
+h2,
+h3 {
+  margin: 0;
+}
+
+button {
+  font-family: inherit;
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+
+input,
+select {
+  font-family: inherit;
+  font-size: 0.95rem;
+}
+
+:focus-visible {
+  outline: 3px solid var(--blue);
+  outline-offset: 2px;
+}
+.badge {
+  display: inline-block;
+  padding: 2px 12px;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.badge-new {
+  background: var(--blue);
+  color: var(--white);
+}
+
+.badge-contacted {
+  background: var(--ice);
+  color: var(--navy);
+  border: 1px solid var(--border);
+}
+
+.badge-qualified {
+  background: var(--chartreuse);
+  color: var(--navy);
+}
+
+.badge-lost {
+  background: var(--navy);
+  color: var(--white);
+}
